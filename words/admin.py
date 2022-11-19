@@ -1,3 +1,5 @@
 from django.contrib import admin
+from words import models
 
-# Register your models here.
+
+admin.site.register(models.DayKeyword)

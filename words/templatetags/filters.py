@@ -1,3 +1,5 @@
+import math
+
 from django import template
 
 register = template.Library()
@@ -11,4 +13,4 @@ def percent(value: str, arg: str):
     if not value.isdigit() or not arg.isdigit():
         return value
 
-    return int(100 * (int(value) - int(arg)) / int(value))
+    return max(min(100 * (int(value) - int(arg)) / int(value), 100), 0)

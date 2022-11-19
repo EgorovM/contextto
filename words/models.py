@@ -8,6 +8,7 @@ class DayKeyword(models.Model):
 
 class UserSession(models.Model):
     session_id = models.CharField(max_length=30, unique=True, db_index=True)
+    keyword = models.ForeignKey(DayKeyword, on_delete=models.CASCADE)
 
 
 class UserGuess(models.Model):
