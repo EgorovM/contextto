@@ -6,7 +6,7 @@ class WordsConfig(AppConfig):
     name = 'words'
 
     def ready(self):
-        from words.models import DayKeyword
+        from words.models import DayKeyword, Word
         from words.guess import WordGuesser
 
         day_keyword = DayKeyword.objects.last()
@@ -16,5 +16,5 @@ class WordsConfig(AppConfig):
             day_keyword = DayKeyword.objects.create(word="вода")
 
         print("initializing app")
-        WordGuesser(day_keyword.word)
+        WordGuesser(day_keyword.word, [word.word for word in Word.objects.all()])
         print("app started!")

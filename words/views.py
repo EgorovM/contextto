@@ -11,7 +11,7 @@ def index(request):
     request.session['session_id'] = session_id
 
     day_keyword = DayKeyword.objects.last()
-    guesser = WordGuesser(day_keyword.word)
+    guesser = WordGuesser()
 
     user_session, created = UserSession.objects.get_or_create(session_id=session_id, keyword=day_keyword)
     guess_history = user_session.userguess_set.order_by("order").all()
@@ -33,7 +33,7 @@ def guess(request):
     request.session['session_id'] = session_id
     user_session = UserSession.objects.get(session_id=session_id, keyword=day_keyword)
 
-    guesser = WordGuesser(day_keyword.word)
+    guesser = WordGuesser()
     guessed_word = request.POST["word"].strip().lower()
 
     if not guesser.has_word(guessed_word):

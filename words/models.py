@@ -7,7 +7,7 @@ class DayKeyword(models.Model):
 
 
 class UserSession(models.Model):
-    session_id = models.CharField(max_length=30, unique=True, db_index=True)
+    session_id = models.CharField(max_length=30, db_index=True)
     keyword = models.ForeignKey(DayKeyword, on_delete=models.CASCADE)
 
 
@@ -16,3 +16,7 @@ class UserGuess(models.Model):
     word = models.CharField(max_length=100)
     order = models.IntegerField()
     datetime = models.DateTimeField(auto_now=True)
+
+
+class Word(models.Model):
+    word = models.CharField(max_length=128)
