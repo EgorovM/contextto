@@ -231,7 +231,10 @@
             const attempt = document.getElementById("guess_number").innerText;
             const text = `Привет! Играю сейчас в классную игру, где нужно отгадать слово 🤓 У меня идет попытка ${attempt}, сможешь быстрее? Присоединяйся! https://guess-word.com/`;
 
-            navigator.clipboard.writeText(text).then(() => {
+            const blob = new Blob([text], { type: "text/html" });
+            const richTextInput = new ClipboardItem({ "text/html": blob });
+
+            navigator.clipboard.write([richTextInput]).then(() => {
                 toast.show()
             }, () => {alert("Что то пошло не так, вот текст! " + text)});
         }
