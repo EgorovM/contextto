@@ -13,7 +13,7 @@ class Singleton(type):
 
 
 class WordGuesser(metaclass=Singleton):
-    def __init__(self, word: str = None, words: list[str] = None) -> None:
+    def __init__(self, word: str = None, words: liste = None) -> None:
         self._navec = Navec.load(settings.BASE_DIR / 'models/navec_hudlit_v1_12B_500K_300d_100q.tar')
         self._word = word
         self._words = words or []
