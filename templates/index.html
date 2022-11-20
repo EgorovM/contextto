@@ -231,7 +231,7 @@
             const toastLiveExample = document.getElementById('liveToast')
             const toast = new bootstrap.Toast(toastLiveExample)
             const attempt = document.getElementById("guess_number").innerText;
-            const text = `Привет! Играю сейчас в классную игру, где нужно отгадать слово 🤓 У меня идет попытка ${attempt}, сможешь быстрее? Присоединяйся! http://194.58.102.189/`;
+            const text = `Привет! Играю сейчас в классную игру, где нужно отгадать слово 🤓 У меня идет попытка ${attempt}, сможешь быстрее? Присоединяйся! https://guess-word.com/`;
 
             navigator.clipboard.writeText(text).then(() => {
                 toast.show()
