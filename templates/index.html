@@ -73,17 +73,6 @@
         body {
             background-color: #E7E1F4;
         }
-        .lg-toolbar {
-            margin-top: 40px !important;
-        }
-
-        .modal-dialog {
-            margin-top: 3rem !important;
-        }
-
-        .toast-top-left, .toast-top-center, .toast-top-right {
-            top: 3rem !important;
-        }
     </style>
 </head>
 <body onload="">
@@ -117,7 +106,7 @@
             </div>
         </div>
         <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-          <div class="modal-dialog">
+          <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
               <div class="modal-header">
                 <h1 class="modal-title fs-5" id="exampleModalLabel">Как играть?</h1>
@@ -139,13 +128,42 @@
         </div>
 
         <div class="modal fade" id="winModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-          <div class="modal-dialog">
+          <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
               <div class="modal-body text-center">
                   <h2>Поздравляю!</h2>
                   <h5 class="mt-3">Вы отгадали загаданное слово за <br> <b>{{ guess_history.count }} попыток</b></h5>
                   <p class="mt-5">Заскринь и поделись с друзьями! <br> <small style="color: #b4b4b4">Убедись, что ответы скрыты, чтобы друзьям тоже было интересно отгадывать!</small></p>
                   <p>До следующего слова <span id="countdown"></span></p>
+
+                  {% if not already_saved_email %}
+                    <button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#notifyModal">Хочу быть в курсе обновления слова!</button>
+                  {% else %}
+                      <small style="color: #b4b4b4">Уже сохранили твою почту и ждем не дождемся уведомить!</small>
+                  {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+        <div class="modal fade" id="notifyModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Подписаться на обновления</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <form method="POST" action="/subscript/">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="exampleInputEmail1" class="form-label">Адрес почты</label>
+                        <input type="email" name="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                        <div id="emailHelp" class="form-text">Будьте уверены, мы не будем показывать почту третьим лицам</div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Подписаться!</button>
+                </form>
               </div>
             </div>
           </div>
@@ -171,9 +189,9 @@
             >
         </form>
 
-        {% if request.GET.invalid %}
+        {% if request.GET.message %}
             <div class="alert alert-primary" role="alert">
-              Слова {{ request.GET.invalid }} нет
+              {{ request.GET.message }}
             </div>
         {% elif last_keyword %}
             <div class="row-wrapper {% if last_keyword.id == last_index %} current {% endif %}">

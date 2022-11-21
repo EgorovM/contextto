@@ -20,3 +20,8 @@ class UserGuess(models.Model):
 
 class Word(models.Model):
     word = models.CharField(max_length=128)
+
+
+class EmailForNotification(models.Model):
+    email = models.CharField(max_length=128)
+    session_id = models.CharField(max_length=30, db_index=True)

@@ -3,7 +3,7 @@ import uuid
 from django.shortcuts import render, redirect
 
 from words.guess import WordGuesser
-from words.models import UserSession, DayKeyword, UserGuess
+from words.models import UserSession, DayKeyword, UserGuess, EmailForNotification
 
 
 def index(request):
@@ -23,6 +23,8 @@ def index(request):
     # fixme: temporal
     max_word = 2000
 
+    already_saved_email = EmailForNotification.objects.filter(session_id=session_id).exists()
+
     return render(request, "index.html", locals())
 
 
@@ -37,7 +39,7 @@ def guess(request):
     guessed_word = request.POST["word"].strip().lower()
 
     if not guesser.has_word(guessed_word):
-        return redirect(f'/?invalid={guessed_word}')
+        return redirect(f'/?message=Я не знаю слово "{guessed_word}"')
 
     order = guesser.guess(guessed_word)
 
@@ -55,3 +57,14 @@ def clear_history(request):
     request.session['session_id'] = session_id
 
     return redirect('/')
+
+
+def subscript(request):
+    session_id = request.session.get('session_id', uuid.uuid4().hex)
+    request.session['session_id'] = session_id
+
+    email = request.POST["email"]
+
+    EmailForNotification.objects.create(session_id=session_id, email=email)
+
+    return redirect(f'/?message=Почта "{email}" успешно сохранена!')
