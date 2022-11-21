@@ -122,7 +122,7 @@
 
                   <p>Если хотите поделиться результатом с друзьями, убедитесь, что скрыли свои ответы с помощью кнопки "Скрыть ответы". Давайте все насладимся процессом поиска истинного ответа как настоящие детективы!</p>
 
-                  <p>Оригинал игры можно найти по ссылке <a href="https://contexto.me/">https://contexto.me/</a>. По всем вопросам и предложениям обращайтесь к @loalkota в ТГ.</p>
+                  <p>Хочешь всегда быть в курсе обновлений? <br>Подпишись на <a href="https://t.me/guesswordcom">https://t.me/guesswordcom</a></p>
               </div>
             </div>
           </div>
@@ -175,16 +175,15 @@
         <form action="/guess/" method="POST" onsubmit="this.preventDefault()">
             {% csrf_token %}
             <input
-                    class="word"
-                    type="text"
-                    name="word"
-                    placeholder="Введите слово"
-                    autocapitalize="off"
-                    autocomplete="off"
-                    value=""
-                    onkeydown="return /[а-яА-Яa-zA-Z]/i.test(event.key)"
-                    autofocus
-            >
+                class="word"
+                type="text"
+                name="word"
+                placeholder="Введите слово"
+                autocapitalize="off"
+                autocomplete="off"
+                value=""
+                onkeydown="return /[а-яА-Яa-zA-Z]/i.test(event.key)"
+                autofocus>
         </form>
 
         {% if request.GET.message %}
@@ -237,13 +236,17 @@
                     </div>
                 {% endfor %}
             {% else %}
-                <div class="modal-content">
+              <div class="modal-content">
+                  <div class="modal-header">
+                    <p class="mb-0">Хочешь всегда быть в курсе обновлений? <br>Подпишись на канал <a href="https://t.me/guesswordcom">https://t.me/guesswordcom</a></p>
+                  </div>
+              </div>
+
+                <div class="modal-content mt-3">
                   <div class="modal-header">
                     <h1 class="modal-title fs-5" id="exampleModalLabel">Как играть?</h1>
                   </div>
                   <div class="modal-body">
-                      <p><small>Хочешь всегда быть в курсе обновлений? <br>Подпишись на канал <a href="https://t.me/guesswordcom">https://t.me/guesswordcom</a></small></p>
-
                       <p>Отгадайте секретное слово. У вас есть неограниченное количество попыток.</p>
 
                       <p>Слова были отсортированы алгоритмом искусственного интеллекта в соответствии с тем, насколько они похожи с точки зрения ассоциаций на секретное слово.</p>
