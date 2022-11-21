@@ -115,13 +115,13 @@
               <div class="modal-body">
                   <p>Отгадайте секретное слово. У вас есть неограниченное количество попыток.</p>
 
-                  <p>Слова были отсортированы алгоритмом искусственного интеллекта в соответствии с тем, насколько они похожи на секретное слово.</p>
+                  <p>Слова были отсортированы алгоритмом искусственного интеллекта в соответствии с тем, насколько они похожи с точки зрения ассоциаций на секретное слово.</p>
 
                   <p>После ввода слова вы увидите его позицию в рейтинге. Секретное слово находится под номером 1.</p>
 
                   <p>Если хотите поделиться результатом с друзьями, убедитесь, что скрыли свои ответы с помощью кнопки "Скрыть ответы". Давайте все насладимся процессом поиска истинного ответа как настоящие детективы!</p>
 
-                  <p>Оригинал игры можно найти по ссылке <a href="https://contexto.me/">https://contexto.me/</a>. По всем вопросам и предложениям обращайтесь к @loalkota в телеграмме.</p>
+                  <p>Оригинал игры можно найти по ссылке <a href="https://contexto.me/">https://contexto.me/</a>. По всем вопросам и предложениям обращайтесь к @loalkota в ТГ.</p>
               </div>
             </div>
           </div>
@@ -134,6 +134,7 @@
                   <h2>Поздравляю!</h2>
                   <h5 class="mt-3">Вы отгадали загаданное слово за <br> <b>{{ guess_history.count }} попыток</b></h5>
                   <p class="mt-5">Заскринь и поделись с друзьями! <br> <small style="color: #b4b4b4">Убедись, что ответы скрыты, чтобы друзьям тоже было интересно отгадывать!</small></p>
+                  <p>До следующего слова <span id="countdown"></span></p>
               </div>
             </div>
           </div>
@@ -240,11 +241,38 @@
                 toast.show()
             }, () => {alert("Что то пошло не так, вот текст! " + text)});
         }
-О
+
+        function startCountDown(countDownDate) {
+            let x = setInterval(function() {
+                var now = new Date().getTime();
+                var distance = countDownDate - now;
+
+                // Time calculations for days, hours, minutes and seconds
+                var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                document.getElementById("countdown").innerHTML = hours + "ч "
+                + minutes + "м " + seconds + "с ";
+
+                if (distance < 0) {
+                    clearInterval(x);
+                    document.getElementById("countdown").innerHTML = "";
+                }
+            }, 1000);
+        }
+
         const myModal = new bootstrap.Modal(document.getElementById("exampleModal"), {});
         const winModal = new bootstrap.Modal(document.getElementById("winModal"), {});
 
         document.onreadystatechange = () => {
+            const today = new Date()
+            const tomorrow = new Date(today)
+            tomorrow.setDate(tomorrow.getDate() + 1)
+            tomorrow.setHours(0,0,0,0)
+
+            startCountDown(tomorrow);
+
             if("{{created}}" === "True") {
                 myModal.show();
             }
