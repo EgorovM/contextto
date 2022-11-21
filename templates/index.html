@@ -315,9 +315,11 @@
 
         document.onreadystatechange = () => {
             const today = new Date()
-            const tomorrow = new Date(today)
+            let tomorrow = new Date(today)
             tomorrow.setDate(tomorrow.getDate() + 1)
             tomorrow.setHours(0,0,0,0)
+            tomorrow = tomorrow.toString().replace('GMT+0300', 'GMT+0900');
+            tomorrow = new Date(tomorrow);
 
             startCountDown(tomorrow);
 
