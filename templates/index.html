@@ -325,7 +325,7 @@
                 // myModal.show();
             }
 
-            if("{{ last_keyword.order }}" === "1") {
+            if("{{ last_keyword.order }}" === "1" && "{{ request.GET.message }}" === "") {
                 hideAnswers(true);
                 winModal.show();
             }
