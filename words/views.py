@@ -33,7 +33,7 @@ def guess(request):
 
     session_id = request.session.get('session_id', uuid.uuid4().hex)
     request.session['session_id'] = session_id
-    user_session = UserSession.objects.get(session_id=session_id, keyword=day_keyword)
+    user_session, created = UserSession.objects.get_or_create(session_id=session_id, keyword=day_keyword)
 
     guesser = WordGuesser()
     guessed_word = request.POST["word"].strip().lower()
