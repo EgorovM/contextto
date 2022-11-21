@@ -198,27 +198,46 @@
         {% endif %}
 
         <div class="guess-history mt-4">
-            {% for guess in guess_history %}
-                <div class="row-wrapper {% if guess.id == last_index %} current {% endif %}">
-                    <div class="outer-bar">
-                        <div class="inner-bar" style="
-                                width: {{ max_word|percent:guess.order }}%;
-                                background-color:
-                                    {% if max_word|percent:guess.order > 70 %}
-                                        #A6C954
-                                    {% elif max_word|percent:guess.order > 50 %}
-                                        #F2A840
-                                    {% else %}
-                                        #FD795E
-                                    {% endif %};">
+            {% if guess_history %}
+                {% for guess in guess_history %}
+                    <div class="row-wrapper {% if guess.id == last_index %} current {% endif %}">
+                        <div class="outer-bar">
+                            <div class="inner-bar" style="
+                                    width: {{ max_word|percent:guess.order }}%;
+                                    background-color:
+                                        {% if max_word|percent:guess.order > 70 %}
+                                            #A6C954
+                                        {% elif max_word|percent:guess.order > 50 %}
+                                            #F2A840
+                                        {% else %}
+                                            #FD795E
+                                        {% endif %};">
+                            </div>
+                        </div>
+                        <div class="row" style="align-items: center; display: flex;">
+                            <span class="answer">{{ guess.word }}</span>
+                            <span>{{ guess.order }}</span>
                         </div>
                     </div>
-                    <div class="row" style="align-items: center; display: flex;">
-                        <span class="answer">{{ guess.word }}</span>
-                        <span>{{ guess.order }}</span>
-                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">Как играть?</h1>
+                  </div>
+                  <div class="modal-body">
+                      <p>Отгадайте секретное слово. У вас есть неограниченное количество попыток.</p>
+
+                      <p>Слова были отсортированы алгоритмом искусственного интеллекта в соответствии с тем, насколько они похожи с точки зрения ассоциаций на секретное слово.</p>
+
+                      <p>После ввода слова вы увидите его позицию в рейтинге. Секретное слово находится под номером 1.</p>
+
+                      <p>Если хотите поделиться результатом с друзьями, убедитесь, что скрыли свои ответы с помощью кнопки "Скрыть ответы". Давайте все насладимся процессом поиска истинного ответа как настоящие детективы!</p>
+
+                      <p>Оригинал игры можно найти по ссылке <a href="https://contexto.me/">https://contexto.me/</a>. По всем вопросам и предложениям обращайтесь к @loalkota в ТГ.</p>
+                  </div>
                 </div>
-            {% endfor %}
+            {% endif %}
         </div>
     </div>
 
@@ -285,7 +304,7 @@
             startCountDown(tomorrow);
 
             if("{{created}}" === "True") {
-                myModal.show();
+                // myModal.show();
             }
 
             if("{{ last_keyword.order }}" === "1") {
