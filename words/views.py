@@ -29,6 +29,9 @@ def index(request):
 
 
 def guess(request):
+    if "word" not in request.POST:
+        return redirect('/?message=Что-то пошло не так, попробуйте еще раз')
+
     day_keyword = DayKeyword.objects.last()
 
     session_id = request.session.get('session_id', uuid.uuid4().hex)
