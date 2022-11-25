@@ -39,7 +39,7 @@ def guess(request):
     user_session, created = UserSession.objects.get_or_create(session_id=session_id, keyword=day_keyword)
 
     guesser = WordGuesser()
-    guessed_word = request.POST["word"].strip().lower()
+    guessed_word = request.POST["word"].strip().lower().replace("ё", "е")
 
     if not guesser.has_word(guessed_word):
         return redirect(f'/?message=Я не знаю слово "{guessed_word}"')
