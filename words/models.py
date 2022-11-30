@@ -17,6 +17,9 @@ class UserGuess(models.Model):
     order = models.IntegerField()
     datetime = models.DateTimeField(auto_now=True)
 
+    def serialize(self):
+        return {"id": self.id, "word": self.word, "order": self.order}
+
 
 class Word(models.Model):
     word = models.CharField(max_length=128)

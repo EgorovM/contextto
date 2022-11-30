@@ -1,6 +1,8 @@
 import datetime
 import uuid
+
 from django.shortcuts import render, redirect
+from django.http import JsonResponse
 
 from words.guess import WordGuesser
 from words.models import UserSession, DayKeyword, UserGuess, EmailForNotification
@@ -62,12 +64,12 @@ def clear_history(request):
     return redirect('/')
 
 
-def subscript(request):
-    session_id = request.session.get('session_id', uuid.uuid4().hex)
-    request.session['session_id'] = session_id
+def get_history(request):
+    session_id = request.GET['session_id']
+    day_keyword = DayKeyword.objects.last()
+    user_session, _ = UserSession.objects.get_or_create(session_id=session_id, keyword=day_keyword)
+    user_guess = UserGuess.objects.filter(session=user_session)
 
-    email = request.POST["email"]
-
-    EmailForNotification.objects.create(session_id=session_id, email=email)
-
-    return redirect(f'/?message=Почта "{email}" успешно сохранена!')
+    return JsonResponse({
+        "guess_history": sorted([ug.serialize() for ug in user_guess], key=lambda x: x["order"])
+    })

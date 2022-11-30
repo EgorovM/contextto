@@ -188,76 +188,36 @@
             <div class="alert alert-primary" role="alert">
               {{ request.GET.message }}
             </div>
-        {% elif last_keyword %}
-            <div class="row-wrapper {% if last_keyword.id == last_index %} current {% endif %}">
-                <div class="outer-bar">
-                    <div class="inner-bar" style="
-                            width: {{ max_word|percent:last_keyword.order }}%;
-                            background-color:
-                                {% if max_word|percent:last_keyword.order > 70 %}
-                                    #A6C954
-                                {% elif max_word|percent:last_keyword.order > 50 %}
-                                    #F2A840
-                                {% else %}
-                                    #FD795E
-                                {% endif %};">
-                    </div>
-                </div>
-                <div class="row" style="align-items: center; display: flex;">
-                    <span class="answer">{{ last_keyword.word }}</span>
-                    <span>{{ last_keyword.order }}</span>
-                </div>
-            </div>
         {% endif %}
 
-        <div class="guess-history mt-4">
-            {% if guess_history %}
-                {% for guess in guess_history %}
-                    <div class="row-wrapper {% if guess.id == last_index %} current {% endif %}">
-                        <div class="outer-bar">
-                            <div class="inner-bar" style="
-                                    width: {{ max_word|percent:guess.order }}%;
-                                    background-color:
-                                        {% if max_word|percent:guess.order > 70 %}
-                                            #A6C954
-                                        {% elif max_word|percent:guess.order > 50 %}
-                                            #F2A840
-                                        {% else %}
-                                            #FD795E
-                                        {% endif %};">
-                            </div>
-                        </div>
-                        <div class="row" style="align-items: center; display: flex;">
-                            <span class="answer">{{ guess.word }}</span>
-                            <span>{{ guess.order }}</span>
-                        </div>
-                    </div>
-                {% endfor %}
-            {% else %}
-              <div class="modal-content">
-                  <div class="modal-header">
-                    <p class="mb-0">Хочешь всегда быть в курсе обновлений? <br>Подпишись на канал <a href="https://t.me/guesswordcom">https://t.me/guesswordcom</a></p>
-                  </div>
-              </div>
+        <div class="mt-4" id="guess-history">
+            <div class="user-guess" data-order="0"></div>
+        </div>
 
-                <div class="modal-content mt-3">
-                  <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="exampleModalLabel">Как играть?</h1>
-                  </div>
-                  <div class="modal-body">
-                      <p>Отгадайте секретное слово. У вас есть неограниченное количество попыток.</p>
-                      <p>
-                          После ввода слова вы увидите его позицию в рейтинге.
-                          Секретное слово находится под номером 1.
-                          Чем сильнее ассоциируется введенное вами слово с секретным, тем оно ниже в рейтинге.
-                          Работает по принципу "тепло-холодно" с помощью подсказок от искусственного интеллекта!
-                      </p>
-                      <p>Удачной игры!</p>
-                      <p>Если хотите поделиться результатом с друзьями, убедитесь, что скрыли свои ответы с помощью кнопки "Скрыть ответы". Давайте все насладимся процессом поиска истинного ответа как настоящие детективы!</p>
-                      <small>Оригинал игры можно найти по ссылке <a href="https://contexto.me/">https://contexto.me/</a></small>
-                  </div>
+        <div id="intro-section">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <p class="mb-0">Хочешь всегда быть в курсе обновлений? <br>Подпишись на канал <a href="https://t.me/guesswordcom">https://t.me/guesswordcom</a></p>
                 </div>
-            {% endif %}
+            </div>
+
+            <div class="modal-content mt-3" id="intro-modal">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">Как играть?</h1>
+                </div>
+                <div class="modal-body">
+                    <p>Отгадайте секретное слово. У вас есть неограниченное количество попыток.</p>
+                    <p>
+                    После ввода слова вы увидите его позицию в рейтинге.
+                    Секретное слово находится под номером 1.
+                    Чем сильнее ассоциируется введенное вами слово с секретным, тем оно ниже в рейтинге.
+                    Работает по принципу "тепло-холодно" с помощью подсказок от искусственного интеллекта!
+                    </p>
+                    <p>Удачной игры!</p>
+                    <p>Если хотите поделиться результатом с друзьями, убедитесь, что скрыли свои ответы с помощью кнопки "Скрыть ответы". Давайте все насладимся процессом поиска истинного ответа как настоящие детективы!</p>
+                    <small>Оригинал игры можно найти по ссылке <a href="https://contexto.me/">https://contexto.me/</a></small>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -265,6 +225,8 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
 
     <script>
+        const HOST = window.location;
+
         function hideAnswers(force = false) {
             let hided = false;
             const answers = document.getElementsByClassName("answer");
@@ -276,6 +238,52 @@
 
             const hideText = document.getElementById("hide-text");
             hideText.innerText = hided ? "Показать" : "Скрыть";
+        }
+
+        async function updateHistory() {
+            const response = await fetch(`${HOST}get_history/?session_id={{ request.session.session_id }}`);
+            const result = (await response.json())["guess_history"];
+            const guesses = document.getElementsByClassName("user-guess");
+            const already_guessed_orders = [];
+
+            for(const guess of guesses) {
+                already_guessed_orders.push(parseInt(guess.dataset.order));
+            }
+
+            for(const new_guess of result) {
+                if(!(new_guess.order in already_guessed_orders)) {
+                    console.log(new_guess.order)
+                    continue;
+                }
+
+                const newGuess = `
+                <div class="row-wrapper user-guess" data-order="${new_guess.order}">
+                    <div class="outer-bar">
+                        <div class="inner-bar" style="">
+                        </div>
+                    </div>
+                    <div class="row" style="align-items: center; display: flex;">
+                        <span class="answer">${new_guess.word}</span>
+                        <span>${new_guess.order}</span>
+                    </div>
+                </div>
+                `
+
+                let added = false;
+
+                for(const guess of document.getElementsByClassName("user-guess")) {
+                    if(parseInt(guess.dataset.order) < new_guess.order) {
+                        guess.before(newGuess);
+                        added = true;
+                        break;
+                    }
+                }
+
+                if(!added) {
+                    const history = document.getElementById("guess-history");
+                    history.innerText += newGuess;
+                }
+            }
         }
 
         function share() {
