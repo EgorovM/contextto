@@ -18,13 +18,8 @@ class UserGuess(models.Model):
     datetime = models.DateTimeField(auto_now=True)
 
     def serialize(self):
-        return {"id": self.id, "word": self.word, "order": self.order}
+        return {"id": self.id, "word": self.word, "order": self.order, "timestamp": self.datetime.timestamp()}
 
 
 class Word(models.Model):
     word = models.CharField(max_length=128)
-
-
-class EmailForNotification(models.Model):
-    email = models.CharField(max_length=128)
-    session_id = models.CharField(max_length=30, db_index=True)
