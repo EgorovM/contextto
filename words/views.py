@@ -84,8 +84,7 @@ def make_guess(request):
     user_session, _ = UserSession.objects.get_or_create(session_id=session_id, keyword=day_keyword)
 
     guesser = WordGuesser()
-    guessed_word = json.loads(request.body.decode("utf-8"))["word"].strip().lower()
-    guessed_word = morph.parse(guessed_word)[0].normal_form.replace("ё", "е")
+    guessed_word = json.loads(request.body.decode("utf-8"))["word"].strip().lower().replace("ё", "е")
 
     if not guesser.has_word(guessed_word):
         return JsonResponse({"error_text": f"Я не знаю слово {guessed_word}"}, status=400)
