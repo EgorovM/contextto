@@ -17,4 +17,3 @@ class WordsConfig(AppConfig):
 
         print("initializing app")
         WordGuesser(day_keyword.word, [word.word for word in Word.objects.all()])
-        print("app started!")

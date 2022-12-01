@@ -154,7 +154,7 @@
             <div class="modal-content">
               <div class="modal-body text-center">
                   <h2>Поздравляю!</h2>
-                  <h5 class="mt-3">Вы отгадали загаданное слово за <br> <b>{{ guess_history.count }} попыток</b></h5>
+                  <h5 class="mt-3">Вы отгадали загаданное слово за <br> <b><span id="final-attempt"></span> попыток</b></h5>
                   <p class="mt-5">Заскринь и поделись с друзьями! <br> <small style="color: #b4b4b4">Убедись, что ответы скрыты, чтобы друзьям тоже было интересно отгадывать!</small></p>
                   <p>До следующего слова <span id="countdown"></span></p>
                   <small style="color: #b4b4b4">
@@ -167,10 +167,10 @@
 
         <div class="game-info d-flex justify-content-between">
             <p>ИГРА: <b>#<span id="game_id">{{ user_session.id }}</span></b></p>
-            <p>ПОПЫТОК: <b><span id="guess_number">{{ guess_history.count }}</span></b></p>
+            <p>ПОПЫТОК: <b><span id="guess_number"></span></b></p>
         </div>
 
-        <form action="/guess/" method="POST" onsubmit="this.preventDefault()">
+        <form action="/guess/" method="POST" onsubmit="guess(); return false;">
             {% csrf_token %}
             <input
                 class="word"
@@ -180,84 +180,42 @@
                 autocapitalize="off"
                 autocomplete="off"
                 value=""
+                id="guess-input"
                 onkeydown="return /[а-яА-Яa-zA-Z]/i.test(event.key)"
                 autofocus>
         </form>
 
-        {% if request.GET.message %}
-            <div class="alert alert-primary" role="alert">
-              {{ request.GET.message }}
-            </div>
-        {% elif last_keyword %}
-            <div class="row-wrapper {% if last_keyword.id == last_index %} current {% endif %}">
-                <div class="outer-bar">
-                    <div class="inner-bar" style="
-                            width: {{ max_word|percent:last_keyword.order }}%;
-                            background-color:
-                                {% if max_word|percent:last_keyword.order > 70 %}
-                                    #A6C954
-                                {% elif max_word|percent:last_keyword.order > 50 %}
-                                    #F2A840
-                                {% else %}
-                                    #FD795E
-                                {% endif %};">
-                    </div>
-                </div>
-                <div class="row" style="align-items: center; display: flex;">
-                    <span class="answer">{{ last_keyword.word }}</span>
-                    <span>{{ last_keyword.order }}</span>
-                </div>
-            </div>
-        {% endif %}
+        <div class="user-guess" id="last-attempt" role="alert">
+        </div>
 
-        <div class="guess-history mt-4">
-            {% if guess_history %}
-                {% for guess in guess_history %}
-                    <div class="row-wrapper {% if guess.id == last_index %} current {% endif %}">
-                        <div class="outer-bar">
-                            <div class="inner-bar" style="
-                                    width: {{ max_word|percent:guess.order }}%;
-                                    background-color:
-                                        {% if max_word|percent:guess.order > 70 %}
-                                            #A6C954
-                                        {% elif max_word|percent:guess.order > 50 %}
-                                            #F2A840
-                                        {% else %}
-                                            #FD795E
-                                        {% endif %};">
-                            </div>
-                        </div>
-                        <div class="row" style="align-items: center; display: flex;">
-                            <span class="answer">{{ guess.word }}</span>
-                            <span>{{ guess.order }}</span>
-                        </div>
-                    </div>
-                {% endfor %}
-            {% else %}
-              <div class="modal-content">
-                  <div class="modal-header">
+        <div class="mt-4" id="guess-history">
+            <div class="user-guess" data-order="0"></div>
+            <div class="user-guess" data-order="99999"></div>
+        </div>
+
+        <div id="intro-section" style="display: none">
+            <div class="modal-content">
+                <div class="modal-header">
                     <p class="mb-0">Хочешь всегда быть в курсе обновлений? <br>Подпишись на канал <a href="https://t.me/guesswordcom">https://t.me/guesswordcom</a></p>
-                  </div>
-              </div>
-
-                <div class="modal-content mt-3">
-                  <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="exampleModalLabel">Как играть?</h1>
-                  </div>
-                  <div class="modal-body">
-                      <p>Отгадайте секретное слово. У вас есть неограниченное количество попыток.</p>
-                      <p>
-                          После ввода слова вы увидите его позицию в рейтинге.
-                          Секретное слово находится под номером 1.
-                          Чем сильнее ассоциируется введенное вами слово с секретным, тем оно ниже в рейтинге.
-                          Работает по принципу "тепло-холодно" с помощью подсказок от искусственного интеллекта!
-                      </p>
-                      <p>Удачной игры!</p>
-                      <p>Если хотите поделиться результатом с друзьями, убедитесь, что скрыли свои ответы с помощью кнопки "Скрыть ответы". Давайте все насладимся процессом поиска истинного ответа как настоящие детективы!</p>
-                      <small>Оригинал игры можно найти по ссылке <a href="https://contexto.me/">https://contexto.me/</a></small>
-                  </div>
                 </div>
-            {% endif %}
+            </div>
+
+            <div class="modal-content mt-3" id="intro-modal">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">Как играть?</h1>
+                </div>
+                <div class="modal-body">
+                    <p>Отгадайте секретное слово. У вас есть неограниченное количество попыток.</p>
+                    <p>
+                    После ввода слова вы увидите его позицию в рейтинге.
+                    Секретное слово находится под номером 1.
+                    Чем сильнее ассоциируется введенное вами слово с секретным, тем оно ниже в рейтинге.
+                    Работает по принципу "тепло-холодно" с помощью подсказок от искусственного интеллекта!
+                    </p>
+                    <p>Если хотите поделиться результатом с друзьями, убедитесь, что скрыли свои ответы с помощью кнопки "Скрыть ответы". Давайте все насладимся процессом поиска истинного ответа как настоящие детективы!</p>
+                    <small>Оригинал игры можно найти по ссылке <a href="https://contexto.me/">https://contexto.me/</a></small>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -265,17 +223,159 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
 
     <script>
-        function hideAnswers(force = false) {
+        const HOST = window.location.host + '/';
+
+        function hideAnswers(force = false, show = false) {
             let hided = false;
             const answers = document.getElementsByClassName("answer");
+
             for(const answer of answers) {
-                if(!force) answer.classList.toggle("hided");
-                else answer.classList.add("hided");
+                if(force && show) answer.classList.remove("hided");
+                else if(force && !show) answer.classList.add("hided");
+                else answer.classList.toggle("hided")
+
                 hided = answer.classList.contains("hided");
             }
 
             const hideText = document.getElementById("hide-text");
             hideText.innerText = hided ? "Показать" : "Скрыть";
+        }
+
+        function getCookie(name) {
+            var cookieValue = null;
+            if (document.cookie && document.cookie != '') {
+                var cookies = document.cookie.split(';');
+                for (var i = 0; i < cookies.length; i++) {
+                    var cookie = cookies[i].trim();
+                    // Does this cookie string begin with the name we want?
+                    if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        async function addHistory(historyGuess) {
+            const already_guessed_orders = [];
+
+            for(const guess of document.getElementsByClassName("user-guess")) {
+                guess.classList.remove("current")
+                already_guessed_orders.push(parseInt(guess.dataset.order));
+            }
+
+            let lastOrder = -1;
+            let lastTimestamp = 0;
+
+            for(const new_guess of historyGuess) {
+                if(new_guess.timestamp > lastTimestamp) {
+                    lastTimestamp = new_guess.timestamp;
+                    lastOrder = new_guess.order;
+                }
+            }
+
+            const maxRating = 2000;
+
+            for(const new_guess of historyGuess) {
+                if(already_guessed_orders.includes(new_guess.order)) {
+                    continue;
+                }
+
+                const newGuess = document.createElement('div');
+                newGuess.classList.add("row-wrapper")
+                newGuess.classList.add("user-guess")
+                newGuess.dataset.order = new_guess.order;
+
+                const percent = Math.max(Math.min(100 * (maxRating - new_guess.order) / maxRating, 100), 0)
+                const innerBarColor = percent > 70 ? '#A6C954' : percent > 50 ? '#F2A840' : '#FD795E';
+
+                newGuess.innerHTML = `
+                    <div class="outer-bar">
+                        <div class="inner-bar" style="width: ${percent}%; background-color: ${innerBarColor}">
+                        </div>
+                    </div>
+                    <div class="row" style="align-items: center; display: flex;">
+                        <span class="answer">${new_guess.word}</span>
+                        <span>${new_guess.order}</span>
+                    </div>
+                `
+                for(const guess of document.getElementsByClassName("user-guess")) {
+                    if(parseInt(guess.dataset.order) > new_guess.order) {
+                        guess.before(newGuess);
+                        break;
+                    }
+                }
+            }
+
+            const guesses = document.getElementsByClassName("user-guess");
+            const attempt_count = guesses.length - 3
+            document.getElementById("guess_number").innerText = attempt_count.toString();
+            document.getElementById("final-attempt").innerText = attempt_count.toString();
+
+            setLastAttempt(lastOrder);
+        }
+
+        function setLastAttempt(lastOrder) {
+            const lastAttempt = document.getElementById("last-attempt");
+
+            for(const guess of document.getElementsByClassName("user-guess")) {
+                if(parseInt(guess.dataset.order) === lastOrder) {
+                    if(parseInt(guess.dataset.order) === 1) {
+                        winModal.show()
+                        hideAnswers(true, false);
+                    }
+
+                    guess.classList.add("current")
+                    lastAttempt.classList.add("current")
+                    lastAttempt.classList.add("row-wrapper")
+                    lastAttempt.classList.add("user-guess")
+                    lastAttempt.classList.remove("alert")
+                    lastAttempt.classList.remove("alert-primary")
+                    lastAttempt.innerHTML = guess.innerHTML;
+                    break;
+                }
+            }
+        }
+
+        async function guess() {
+            let guessInput = document.getElementById("guess-input");
+            const response = await fetch(`/make_guess/?session_id={{ request.session.session_id }}`,{
+                method: "POST",
+                body: JSON.stringify({"word": guessInput.value}),
+                headers: {
+                    "X-CSRFToken": getCookie('csrftoken'),
+                }
+            });
+            const result = await response.json();
+            hideAnswers(true, true);
+
+            guessInput.value = '';
+
+            if(response.status !== 200) {
+                const lastAttempt = document.getElementById("last-attempt");
+                lastAttempt.classList.remove("row-wrapper")
+                lastAttempt.classList.remove("userguess")
+                lastAttempt.classList.remove("current")
+                lastAttempt.classList.add("alert")
+                lastAttempt.classList.add("alert-primary")
+                lastAttempt.innerText = result["error_text"];
+                return;
+            }
+
+            document.getElementById('intro-section').style.display = "none";
+            await addHistory(result["guess_history"])
+        }
+
+        async function updateHistory() {
+            const response = await fetch(`/get_history/?session_id={{ request.session.session_id }}`);
+            const result = (await response.json())["guess_history"];
+
+            if(!result.length) {
+                document.getElementById('intro-section').style.display = "block";
+            }
+
+            await addHistory(result)
         }
 
         function share() {
@@ -315,6 +415,8 @@
         const myModal = new bootstrap.Modal(document.getElementById("exampleModal"), {});
         const winModal = new bootstrap.Modal(document.getElementById("winModal"), {});
 
+        let winModalShowed = false;
+
         document.onreadystatechange = () => {
             const today = new Date()
             let tomorrow = new Date(today)
@@ -324,15 +426,17 @@
             tomorrow = new Date(tomorrow);
 
             startCountDown(tomorrow);
-
-            if("{{created}}" === "True") {
-                // myModal.show();
-            }
-
-            if("{{ last_keyword.order }}" === "1" && "{{ request.GET.message }}" === "") {
-                hideAnswers(true);
-                winModal.show();
-            }
+            updateHistory().then(() => {
+                if(!winModalShowed) {
+                    for(const guess of document.getElementsByClassName("user-guess")) {
+                        if(guess.dataset.order === "1") {
+                            hideAnswers(true, false);
+                            winModal.show();
+                            winModalShowed = true;
+                        }
+                    }
+                }
+            });
         }
     </script>
 </body>
