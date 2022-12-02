@@ -1,6 +1,7 @@
 import datetime
 import json
 import uuid
+
 import pymorphy2
 
 from django.shortcuts import render, redirect
@@ -9,6 +10,10 @@ from django.http import JsonResponse
 from words.guess import WordGuesser
 from words.models import UserSession, DayKeyword, UserGuess
 
+from rest_framework.viewsets import GenericViewSet
+from rest_framework.response import Response
+from rest_framework import mixins
+from .serializers import SessionSerializer
 
 morph = pymorphy2.MorphAnalyzer()
 
@@ -101,3 +106,20 @@ def make_guess(request):
     return JsonResponse({
         "guess_history": [user_guess.serialize()]
     })
+
+
+""""
+Django REST framework
+"""
+
+
+class SessionView(GenericViewSet, mixins.CreateModelMixin, mixins.DestroyModelMixin):
+    queryset = UserSession.objects
+    serializer_class = SessionSerializer
+    lookup_field = 'session_id'
+
+    def create(self, request, *args, **kwargs):
+        day_keyword = DayKeyword.objects.last()
+        new_session = UserSession.objects.create(keyword=day_keyword, session_id=uuid.uuid4().hex)
+        serializer = self.serializer_class(new_session)
+        return Response(serializer.data, status=201)
