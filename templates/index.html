@@ -170,7 +170,7 @@
             <p>ПОПЫТОК: <b><span id="guess_number"></span></b></p>
         </div>
 
-        <form action="/guess/" method="POST" onsubmit="guess(); return false;">
+        <form action="/guess/" method="POST" onsubmit="guess(event); return false;">
             {% csrf_token %}
             <input
                 class="word"
@@ -226,7 +226,7 @@
         const HOST = window.location.host + '/';
 
         function hideAnswers(force = false, show = false) {
-            let hided = false;
+            var hided = false;
             const answers = document.getElementsByClassName("answer");
 
             for(const answer of answers) {
@@ -265,8 +265,8 @@
                 already_guessed_orders.push(parseInt(guess.dataset.order));
             }
 
-            let lastOrder = -1;
-            let lastTimestamp = 0;
+            var lastOrder = -1;
+            var lastTimestamp = 0;
 
             for(const new_guess of historyGuess) {
                 if(new_guess.timestamp > lastTimestamp) {
@@ -338,8 +338,9 @@
             }
         }
 
-        async function guess() {
-            let guessInput = document.getElementById("guess-input");
+        async function guess(e) {
+            e.preventDefault();
+            var guessInput = document.getElementById("guess-input");
             const response = await fetch(`/make_guess/?session_id={{ request.session.session_id }}`,{
                 method: "POST",
                 body: JSON.stringify({"word": guessInput.value}),
@@ -393,7 +394,7 @@
         }
 
         function startCountDown(countDownDate) {
-            let x = setInterval(function() {
+            var x = setInterval(function() {
                 var now = new Date().getTime();
                 var distance = countDownDate - now;
 
@@ -415,11 +416,11 @@
         const myModal = new bootstrap.Modal(document.getElementById("exampleModal"), {});
         const winModal = new bootstrap.Modal(document.getElementById("winModal"), {});
 
-        let winModalShowed = false;
+        var winModalShowed = false;
 
         document.onreadystatechange = () => {
             const today = new Date()
-            let tomorrow = new Date(today)
+            var tomorrow = new Date(today)
             tomorrow.setDate(tomorrow.getDate() + 1)
             tomorrow.setHours(0,0,0,0)
             tomorrow = tomorrow.toString().replace(/GMT\+\d\d\d\d/, 'GMT+0900');
