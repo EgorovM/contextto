@@ -1,0 +1,29 @@
+version: "3.8"
+
+services:
+  db:
+    image: postgres
+    env_file:
+      - enviroments/db.env
+
+  learning-trajectories:
+    image: contextto:dev
+    build:
+      dockerfile: Dockerfile
+      context: ./
+    container_name: learning-trajectories
+    env_file:
+      - environment/db.env
+    ports:
+      - "4700:4700"
+    volumes:
+      - static_data:/app/static
+
+networks:
+  default:
+    name: web
+    external: true
+
+volumes:
+  static_data:
+    name: static_data
