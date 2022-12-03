@@ -2,6 +2,11 @@ from navec import Navec
 from django.conf import settings
 from scipy.spatial.distance import cosine
 
+import pymorphy2
+
+
+morph = pymorphy2.MorphAnalyzer()
+
 
 class Singleton(type):
     _instances = {}
@@ -31,3 +36,7 @@ class WordGuesser(metaclass=Singleton):
     def guess(self, word: str) -> int:
         """ Return distance to the provided word """
         return self._word2order[word]
+
+    def normalize_word(self, word):
+        word = word.strip().lower()
+        return morph.parse(word)[0].normal_form.replace("ё", "е")
