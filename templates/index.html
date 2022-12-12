@@ -114,6 +114,7 @@
               </button>
 
               <ul class="dropdown-menu dropdown-menu-end">
+                <li><button class="dropdown-item" type="button" data-bs-toggle="modal" data-bs-target="#attemptsModal">История попыток</button></li>
                 <li><a href="clear_history/" class="dropdown-item" type="button">Очистить историю</a></li>
                 <li><button class="dropdown-item" type="button" onclick="hideAnswers()"><span id="hide-text">Скрыть</span> ответы</button></li>
                 <li><button class="dropdown-item" type="button" data-bs-toggle="modal" data-bs-target="#exampleModal">Правила игры</button></li>
@@ -160,6 +161,18 @@
                   <small style="color: #b4b4b4">
                       Хочешь всегда быть в курсе обновлений? <br>Подпишись на <a href="https://t.me/guesswordcom">https://t.me/guesswordcom</a>
                   </small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal fade" id="attemptsModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+              <div class="modal-body text-center">
+                  <h4>Ваша история попыток</h4>
+                  <div id="attemptsHistoryDiv">
+                  </div>
               </div>
             </div>
           </div>
@@ -415,8 +428,42 @@
 
         const myModal = new bootstrap.Modal(document.getElementById("exampleModal"), {});
         const winModal = new bootstrap.Modal(document.getElementById("winModal"), {});
+        const attemptsModal = new bootstrap.Modal(document.getElementById("attemptsModal"), {});
 
         var winModalShowed = false;
+
+        document.getElementById("attemptsModal").addEventListener("show.bs.modal", async function (event) {
+            console.log("asd")
+            const attempts = await fetch("/get_attempts/?session_id={{ request.session.session_id }}");
+            const guess_history = (await attempts.json())["guess_history"];
+            const container = document.getElementById("attemptsHistoryDiv")
+            const maxRating = 2000;
+
+            container.innerHTML = "";
+
+            for(let new_guess of guess_history) {
+                const newGuess = document.createElement('div');
+                newGuess.classList.add("row-wrapper")
+                newGuess.classList.add("user-guess")
+                newGuess.dataset.order = new_guess.order;
+
+                const percent = Math.max(Math.min(100 * (maxRating - new_guess.order) / maxRating, 100), 0)
+                const innerBarColor = percent > 70 ? '#A6C954' : percent > 50 ? '#F2A840' : '#FD795E';
+
+                newGuess.innerHTML = `
+                    <div class="outer-bar">
+                        <div class="inner-bar" style="width: ${percent}%; background-color: ${innerBarColor}">
+                        </div>
+                    </div>
+                    <div class="row" style="align-items: center; display: flex;">
+                        <span class="answer">${new_guess.word}</span>
+                        <span>${new_guess.order}</span>
+                    </div>
+                `
+
+                container.append(newGuess)
+            }
+        })
 
         document.onreadystatechange = () => {
             const today = new Date()
