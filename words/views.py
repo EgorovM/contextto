@@ -51,7 +51,7 @@ def guess(request):
 
     order = guesser.guess(guessed_word)
 
-    user_guess, created = UserGuess.objects.get_or_create(session=user_session, word=guessed_word, order=order)
+    user_guess = UserGuess.objects.create(session=user_session, word=guessed_word, order=order)
 
     if not created:
         user_guess.datetime = datetime.datetime.now()
@@ -71,10 +71,29 @@ def get_history(request):
     session_id = request.GET['session_id']
     day_keyword = DayKeyword.objects.last()
     user_session, _ = UserSession.objects.get_or_create(session_id=session_id, keyword=day_keyword)
-    user_guess = UserGuess.objects.filter(session=user_session)
+    user_guess = []
+    orders = set()
+
+    for guess in UserGuess.objects.filter(session=user_session).order_by("-datetime").all():
+        if guess.order in orders:
+            continue
+
+        user_guess.append(guess)
+        orders.add(guess.order)
 
     return JsonResponse({
         "guess_history": sorted([ug.serialize() for ug in user_guess], key=lambda x: x["order"])
+    })
+
+
+def get_attempts(request):
+    session_id = request.GET['session_id']
+    day_keyword = DayKeyword.objects.last()
+    user_session, _ = UserSession.objects.get_or_create(session_id=session_id, keyword=day_keyword)
+    user_guess = UserGuess.objects.filter(session=user_session).order_by("datetime")
+
+    return JsonResponse({
+        "guess_history": [ug.serialize() for ug in user_guess]
     })
 
 
@@ -91,11 +110,7 @@ def make_guess(request):
 
     order = guesser.guess(guessed_word)
 
-    user_guess, created = UserGuess.objects.get_or_create(session=user_session, word=guessed_word, order=order)
-
-    if not created:
-        user_guess.datetime = datetime.datetime.now()
-        user_guess.save()
+    user_guess = UserGuess.objects.create(session=user_session, word=guessed_word, order=order)
 
     return JsonResponse({
         "guess_history": [user_guess.serialize()]
