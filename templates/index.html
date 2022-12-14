@@ -444,23 +444,28 @@
 
             container.innerHTML = "";
 
-            for(let new_guess of guess_history) {
+            for(let i = 0; i < guess_history.length; i++) {
+                const new_guess = guess_history[i];
                 const newGuess = document.createElement('div');
-                newGuess.classList.add("row-wrapper")
-                newGuess.classList.add("user-guess")
-                newGuess.dataset.order = new_guess.order;
 
                 const percent = Math.max(Math.min(100 * (maxRating - new_guess.order) / maxRating, 100), 0)
                 const innerBarColor = percent > 70 ? '#A6C954' : percent > 50 ? '#F2A840' : '#FD795E';
 
                 newGuess.innerHTML = `
-                    <div class="outer-bar">
-                        <div class="inner-bar" style="width: ${percent}%; background-color: ${innerBarColor}">
+                    <div class="d-flex">
+                    <div style="width: 50px; text-align: center; display: flex; flex-direction: column; justify-content: center; flex-wrap: nowrap">
+                        ${i + 1}
+                    </div>
+                    <div class="row-wrapper" data-order="${new_guess.order}" style="width: 100%">
+                        <div class="outer-bar">
+                            <div class="inner-bar" style="width: ${percent}%; background-color: ${innerBarColor}">
+                            </div>
+                        </div>
+                        <div class="row" style="align-items: center; display: flex;">
+                            <span class="answer">${new_guess.word}</span>
+                            <span>${new_guess.order}</span>
                         </div>
                     </div>
-                    <div class="row" style="align-items: center; display: flex;">
-                        <span class="answer">${new_guess.word}</span>
-                        <span>${new_guess.order}</span>
                     </div>
                 `
 
