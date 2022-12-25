@@ -8,8 +8,9 @@ class WordsConfig(AppConfig):
     def ready(self):
         from words.models import DayKeyword, Word
         from words.guess import WordGuesser
+        from words.views import get_today_keyword
 
-        day_keyword = DayKeyword.objects.last()
+        day_keyword = get_today_keyword()
 
         # fixme: temporal
         if not day_keyword:
