@@ -3,7 +3,7 @@ from django.db import models
 
 class DayKeyword(models.Model):
     word = models.CharField(max_length=120)
-    date = models.DateField(auto_now=True)
+    date = models.DateField(null=True)
 
 
 class UserSession(models.Model):
