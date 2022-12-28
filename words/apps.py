@@ -1,3 +1,5 @@
+import datetime
+
 from django.apps import AppConfig
 
 
@@ -14,7 +16,7 @@ class WordsConfig(AppConfig):
 
         # fixme: temporal
         if not day_keyword:
-            day_keyword = DayKeyword.objects.create(word="вода")
+            day_keyword = DayKeyword.objects.create(word="вода", date=datetime.datetime.now())
 
         print("initializing app")
         WordGuesser(day_keyword.word, [word.word for word in Word.objects.all()])
